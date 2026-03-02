@@ -1,4 +1,4 @@
-# crdb_retail_chat
+# CockroachDB Retail Chat
 A simple agentic retail assistant using CockroachDB, HTMX, OpenAI, and custom OpenAI tooling.
 
 ### Setup
