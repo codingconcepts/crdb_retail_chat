@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Shopper Agent</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 820px;
+        margin: 32px auto;
+        padding: 0 16px;
+      }
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 16px;
+      }
+      #chat {
+        height: 55vh;
+        overflow: auto;
+        padding: 12px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        background: #fafafa;
+      }
+      .msg {
+        margin: 10px 0;
+      }
+      .me {
+        font-weight: 600;
+      }
+      .bot {
+        font-weight: 600;
+      }
+      .bubble {
+        display: inline-block;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid #eee;
+        max-width: 100%;
+        white-space: pre-wrap;
+      }
+      form {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      input[type="text"] {
+        flex: 1;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+      }
+      button {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        background: #fff;
+        cursor: pointer;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .row input {
+        flex: 1;
+      }
+      .muted {
+        color: #666;
+        font-size: 14px;
+      }
+      .spinner {
+        display: none;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #ddd;
+        border-top-color: #666;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        align-self: center;
+      }
+      .htmx-request .spinner {
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Shopper Agent</h1>
+
+    <div class="card">
+      <div class="row">
+        <input
+          id="customer_id"
+          name="customer_id"
+          type="text"
+          value="0ba8f6c1-5817-456f-9503-69e0799faa0b"
+          placeholder="Customer ID"
+        />
+      </div>
+      <div class="muted">
+        Tip: keep the same session id to preserve context.
+      </div>
+
+      <div id="chat" aria-live="polite"></div>
+
+      <form
+        hx-post="/ui/chat"
+        hx-target="#chat"
+        hx-swap="beforeend"
+        hx-indicator="#spinner"
+        hx-on::after-request="this.reset(); document.getElementById('message').focus(); scrollChat();"
+      >
+        <input type="hidden" name="customer_id" id="customer_id_hidden" />
+
+        <input
+          id="message"
+          name="message"
+          type="text"
+          placeholder="Ask for products, add items, checkout…"
+          autocomplete="off"
+          required
+        />
+
+        <button type="submit">Send</button>
+
+        <span
+          id="spinner"
+          class="spinner"
+          aria-label="Loading"
+          title="Loading"
+        ></span>
+      </form>
+
+      <script>
+        const visible = document.getElementById("customer_id");
+        const hidden = document.getElementById("customer_id_hidden");
+        hidden.value = visible.value;
+        visible.addEventListener("input", () => (hidden.value = visible.value));
+
+        function scrollChat() {
+          const el = document.getElementById("chat");
+          el.scrollTop = el.scrollHeight;
+        }
+      </script>
+    </div>
+  </body>
+</html>
